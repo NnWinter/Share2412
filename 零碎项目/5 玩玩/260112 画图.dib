@@ -1,0 +1,160 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","languageName":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!csharp
+
+          //.Net9 //
+#r "nuget: System.Drawing.Common, 9.0.11"
+using System.IO;
+using System.Drawing;
+using System.Globalization;
+static PointF[] P(string points)
+{
+    var tokens = points.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var pts = new PointF[tokens.Length / 2];
+    for (int i = 0; i < pts.Length; i++)
+    {
+        float x = float.Parse(tokens[i * 2], CultureInfo.InvariantCulture);
+        float y = float.Parse(tokens[i * 2 + 1], CultureInfo.InvariantCulture);
+        pts[i] = new PointF(x*1.33f, y*1.33f);
+    }
+    return pts;
+}
+static void DrawBody(Bitmap bmp)
+{
+    using var g = Graphics.FromImage(bmp);
+    g.Clear(Color.Transparent);
+
+    // SVG style -> GDI+ brush/pen
+    using var 警徽 = new SolidBrush(ColorTranslator.FromHtml("#c8b483"));
+    using var 胳膊 = new SolidBrush(ColorTranslator.FromHtml("#83a2d1"));
+    using var 袖套 = new SolidBrush(ColorTranslator.FromHtml("#242533"));
+    using var 腰带 = new SolidBrush(ColorTranslator.FromHtml("#151518"));
+    using var 裤子 = new SolidBrush(ColorTranslator.FromHtml("#21324a"));
+    using var 手 = new SolidBrush(ColorTranslator.FromHtml("#a59997"));
+    using var 防弹衣 = new SolidBrush(ColorTranslator.FromHtml("#1e2434"));
+    using var 内衬 = new SolidBrush(ColorTranslator.FromHtml("#354c75"));
+
+    using var 描边 = new Pen(Color.Black, 0.1f) { MiterLimit = 10f };
+
+    g.FillPolygon(内衬,
+        P("254 533.67 269.89 506.56 311.67 511.11 321.78 503.89 " +
+        "347.56 515.44 391.11 566.56 392.67 579 351.33 580.22 " +
+        "357.11 636.67 345.56 648.56 285.78 618.67 291.78 603.22 " +
+        "254 533.67"));
+    g.FillPolygon(防弹衣,
+        P("275.94 571.42 296.44 561.25 295.64 540.83 275.94 518.08 " +
+        "258.11 521.42 267.28 512.58 284.78 510.75 320.28 517.58 " +
+        "324.94 503.08 336.61 509.75 352.65 545.75 355.81 589.42 " +
+        "322.28 576.58 285.44 593.25 275.94 571.42"));
+    g.FillPolygon(胳膊,
+        P("255.8 531.7 258.11 521.42 275.94 518.08 316.1 564.45 " +
+        "352.65 545.75 337.12 510.77 347.56 515.44 391.11 566.56 " +
+        "392.67 579 345.01 580.57 320.24 595.09 304.53 595.68 " +
+        "261.47 555.36 255.8 531.7"));
+    g.FillPolygon(袖套,
+        P("322.81 561.01 352.65 545.75 372.82 551.91 372.82 565.7 " +
+        "336.39 585.99 335.86 572.54 322.81 561.01"));
+    g.FillPolygon(手,
+        P("286.22 552.46 293.47 542.8 306.47 543.55 327.89 559.88 " +
+        "327.89 568.13 318.14 570.55 291.39 559.3 286.22 552.46"));
+    g.FillPolygon(手,
+        P("352.65 545.75 349.82 539.36 353.43 536.58 363.91 549.19"));
+    g.FillPolygon(警徽,
+        P("329.26 518.41 337.18 518.41 339.26 516.16 343.68 523.75 " +
+        "350.01 530.33 347.34 536.33 337.59 533.75 333.93 525.58 " +
+        "329.26 518.41"));
+    g.FillPolygon(裤子,
+        P("285.78 618.67 254.81 658.32 237.73 715.98 235.4 783.32 " +
+        "215.68 845.98 230.84 850.43 246.01 847.26 277.73 795.32 " +
+        "306.96 730.98 303.4 786.32 303.34 848.43 317.51 851.59 " +
+        "330.34 847.93 366.73 742.32 369.73 679.32 357.11 636.67 " +
+        "345.56 648.56 285.78 618.67"));
+    g.FillPolygon(腰带,
+        P("252.68 649.37 270.68 620.59 290.23 633.59 288.01 639.04 " +
+        "296.56 643.59 298.68 641.26 324.68 653.04 324.68 655.71 " +
+        "341.23 657.71 342.79 654.48 357.56 650.04 358.9 634.82 " +
+        "363.01 631.71 369.79 631.37 380.23 661.15 368.01 671.82 " +
+        "317.68 673.59 308.45 687.71 281.79 676.48 289.79 662.48 " +
+        "276.45 652.93 269.45 663.15 252.68 649.37"));
+}
+
+var drawing = new Bitmap(565, 1280);
+DrawBody(drawing);
+
+// 注意：JPG 不支持透明通道；如果你要保留透明，建议改成 PNG
+drawing.Save("260112_drawing.png");
+
+var screenshot = Image.FromFile("260112_screenshot.jpg");
+using (var g = Graphics.FromImage(screenshot))
+{
+    g.DrawImage(drawing, new Point(0, 0));
+}
+screenshot.Save("260112_result.jpg");
+
+#!csharp
+
+          //.Net9 //
+#r "nuget: System.Drawing.Common, 9.0.11"
+using System.IO;
+using System.Drawing;
+using System.Globalization;
+static PointF[] P(string points){
+    var tokens = points.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var pts = new PointF[tokens.Length / 2];
+    for (int i = 0; i < pts.Length; i++){
+        float x = float.Parse(tokens[i * 2], CultureInfo.InvariantCulture);
+        float y = float.Parse(tokens[i * 2 + 1], CultureInfo.InvariantCulture);
+        pts[i] = new PointF(x*1.33f, y*1.33f);}
+    return pts;}
+static void DrawBody(Bitmap bmp){
+    using var g = Graphics.FromImage(bmp);
+    g.Clear(Color.Transparent);
+    using var 警徽 = new SolidBrush(ColorTranslator.FromHtml("#c8b483"));
+    using var 胳膊 = new SolidBrush(ColorTranslator.FromHtml("#83a2d1"));
+    using var 袖套 = new SolidBrush(ColorTranslator.FromHtml("#242533"));
+    using var 腰带 = new SolidBrush(ColorTranslator.FromHtml("#151518"));
+    using var 裤子 = new SolidBrush(ColorTranslator.FromHtml("#21324a"));
+    using var 手 = new SolidBrush(ColorTranslator.FromHtml("#a59997"));
+    using var 防弹衣 = new SolidBrush(ColorTranslator.FromHtml("#1e2434"));
+    using var 内衬 = new SolidBrush(ColorTranslator.FromHtml("#354c75"));
+    using var 描边 = new Pen(Color.Black, 0.1f) { MiterLimit = 10f };
+g.FillPolygon(内衬,
+                                       P("254 533.67 269.89 506.56 311.67 511.11 321.78 503.89 " +                  "347.56 515.44 391.11 566.56 392.67 579 351.33 580.22 " +                                    
+        "357.11 636.67 345.56 648.56 285.78 618.67 291.78 603.22 " +                  "254 533.67"));  g.FillPolygon(防弹衣,                                                 
+        P("275.94 571.42 296.44 561.25 295.64 540.83 275.94 518.08 " +                  "258.11 521.42 267.28 512.58 284.78 510.75 320.28 517.58 " +     
+        "324.94 503.08 336.61 509.75 352.65 545.75 355.81 589.42 " +                  "322.28 576.58 285.44 593.25 275.94 571.42"));                              
+    g.FillPolygon(胳膊, P("255.8 531.7 258.11 521.42 275.94 518.08 " +                  "316.1 564.45  352.65 545.75 337.12 510.77 347.56 515.44 " +       
+                "391.11 566.56  392.67 579 345.01 580.57 320.24 595.09 " +                  "261.47 555.36 255.8 531.7  304.53 595.68")); g.FillPolygon(袖套,
+        P("322.81 561.01 352.65 545.75 372.82 551.91 372.82 565.7 " +
+        "336.39 585.99 335.86 572.54 322.81 561.01"));
+    g.FillPolygon(手,
+        P("286.22 552.46 293.47 542.8 306.47 543.55 327.89 559.88 " +
+        "327.89 568.13 318.14 570.55 291.39 559.3 286.22 552.46"));
+    g.FillPolygon(手,
+        P("352.65 545.75 349.82 539.36 353.43 536.58 363.91 549.19"));
+    g.FillPolygon(警徽,
+        P("329.26 518.41 337.18 518.41 339.26 516.16 343.68 523.75 " +
+        "350.01 530.33 347.34 536.33 337.59 533.75 333.93 525.58 " +
+        "329.26 518.41"));
+    g.FillPolygon(裤子,
+        P("285.78 618.67 254.81 658.32 237.73 715.98 235.4 783.32 " +
+        "215.68 845.98 230.84 850.43 246.01 847.26 277.73 795.32 " +
+        "306.96 730.98 303.4 786.32 303.34 848.43 317.51 851.59 " +
+        "330.34 847.93 366.73 742.32 369.73 679.32 357.11 636.67 " +
+        "345.56 648.56 285.78 618.67"));
+    g.FillPolygon(腰带,
+        P("252.68 649.37 270.68 620.59 290.23 633.59 288.01 639.04 " +
+        "296.56 643.59 298.68 641.26 324.68 653.04 324.68 655.71 " +
+        "341.23 657.71 342.79 654.48 357.56 650.04 358.9 634.82 " +
+        "363.01 631.71 369.79 631.37 380.23 661.15 368.01 671.82 " +
+        "317.68 673.59 308.45 687.71 281.79 676.48 289.79 662.48 " +
+        "276.45 652.93 269.45 663.15 252.68 649.37"));}
+var drawing =                         new Bitmap(565, 1280);
+DrawBody(                                        drawing);
+drawing.Save(                                       "260112_drawing.png");
+var screenshot = Image.FromFile(                              "260112_screenshot.jpg");
+                                          using (var g =              Graphics.FromImage(screenshot)){
+    g.DrawImage(drawing,                                       new Point(0, 0));}
+screenshot.Save(                                            "260112_result.jpg");

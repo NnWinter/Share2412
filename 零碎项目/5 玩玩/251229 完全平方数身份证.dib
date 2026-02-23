@@ -1,0 +1,110 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!csharp
+
+int minRoot = 10_000_000, maxRoot = 1_000_000_000; // 最小15位数的平方根约为10^7，最大18位数的平方根约为10^9
+var squares = Enumerable.Range(minRoot, maxRoot - minRoot + 1).Select(i => (long)i * i).ToArray();
+Console.WriteLine($"预计算了 {squares.Length} 个平方数, 范围从 {squares[0]} 到 {squares[^1]}");
+
+#!csharp
+
+// 预定义函数 //
+using System.IO;
+struct IdInfo{
+    public long IdNumber;
+    public double SquareRoot;
+    public int LocationCode;
+    public string Province;
+    public string City;
+    public DateTime BirthDate;
+    public string Gender;
+    public short CheckDigit;
+    // 身份证, 平方根, 省/市代码, 出生日期, 性别, 校验码
+    public override string ToString() => $"{IdNumber} , {SquareRoot:F2} , [{LocationCode}]{Province}-{City} , {BirthDate:yyyy-MM-dd} , {Gender} , {CheckDigit}";
+}
+static readonly string?[] 省份 = new string?[100];
+省份[11]="北京"; 省份[12]="天津"; 省份[13]="河北"; 省份[14]="山西"; 省份[15]="内蒙古";
+省份[21]="辽宁"; 省份[22]="吉林"; 省份[23]="黑龙江";
+省份[31]="上海"; 省份[32]="江苏"; 省份[33]="浙江"; 省份[34]="安徽"; 省份[35]="福建"; 省份[36]="江西"; 省份[37]="山东";
+省份[41]="河南"; 省份[42]="湖北"; 省份[43]="湖南"; 省份[44]="广东"; 省份[45]="广西"; 省份[46]="海南";
+省份[50]="重庆"; 省份[51]="四川"; 省份[52]="贵州"; 省份[53]="云南"; 省份[54]="西藏";
+省份[61]="陕西"; 省份[62]="甘肃"; 省份[63]="青海"; 省份[64]="宁夏"; 省份[65]="新疆";
+省份[71]="台湾"; 省份[81]="香港"; 省份[82]="澳门"; 省份[91]="国外";
+
+// 快速计算某月的天数，假设月份合法（1-12）
+static int 月天数(int y, int m){
+    if (m == 2){bool leap = (y % 4 == 0) && (y % 100 != 0 || y % 400 == 0); return leap ? 29 : 28;} // 2月
+    return (m == 4 || m == 6 || m == 9 || m == 11) ? 30 : 31;} // 31天
+static Dictionary<int,string> gb2260_Dict = new();
+var gb2260_Lines = File.ReadAllLines("GB2260-200712.tsv");
+foreach(var line in gb2260_Lines){
+    var parts = line.Split('\t');
+    if (parts.Length >= 4 && int.TryParse(parts[2], out int code)){
+        gb2260_Dict[code] = parts[3];
+    }
+}
+static int 读取位段(Span<byte> dgt, int start, int length){
+    int val = 0;
+    for (int i = 0; i < length; i++){
+        val = val * 10 + dgt[start + i];
+    }
+    return val;
+}
+
+#!csharp
+
+List<IdInfo> results = new();
+foreach (var x in squares){if (!读取有效15位18位身份证(x, out var id)) continue;results.Add(id);}
+Console.WriteLine($"找到 {results.Count} 个完全平方数的身份证号码");
+
+static readonly int[] W = { 7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2 };
+static readonly char[] MAP = "10X98765432".ToCharArray();
+static bool 读取有效15位18位身份证(long n, out IdInfo info)
+{
+    info = default;
+    // 位数只接受15/18
+    int len = (ulong)n >= 100_000_000_000_000_000UL ? 18 : (ulong)n >= 100_000_000_000_000UL  ? 15 : 0; if (len == 0) return false;
+    // 取出每一位数字：d[0]最高位 ... d[len-1]最低位
+    Span<byte> dgt = stackalloc byte[18];
+    long t = n;
+    for (int i = len - 1; i >= 0; i--){ long q = t / 10; dgt[i] = (byte)(t - q * 10); t = q; } if (t != 0) return false; // 防御
+    byte 省码 = (byte)(dgt[0] * 10 + dgt[1]); string? 省 = 省码 < 100 ? 省份[省码] : null; if (省 is null) return false;
+
+    int y = len == 18 ? dgt[6]*1000 + dgt[7]*100 + dgt[8]*10 + dgt[9] : 1900 + dgt[6]*10 + dgt[7];
+    int m = len == 18 ? dgt[10]*10 + dgt[11] : dgt[8]*10 + dgt[9];
+    int d = len == 18 ? dgt[12]*10 + dgt[13] : dgt[10]*10 + dgt[11];
+    if (y < 1900 || y > 2100) return false;
+    if (len == 15 && y >= 2000) return false; // 15位身份证不可能出生年份>=2000
+
+    if ((uint)(m - 1) > 11) return false; int dim = 月天数(y, m); if ((uint)(d - 1) >= (uint)dim) return false;
+
+    // 顺序码不能全000：18位[14..16]，15位[12..14]
+    int a = len == 18 ? 14 : 12; if (dgt[a] == 0 && dgt[a + 1] == 0 && dgt[a + 2] == 0) return false;
+    bool male = ((dgt[len == 18 ? 16 : 14] & 1) == 1);
+
+    short check = -1;
+    if (len == 18){
+        int sum = 0;
+        for (int i = 0; i < 17; i++) sum += dgt[i] * W[i];
+        char c = MAP[sum % 11];
+        if (c == 'X') return false;                //纯数字平方不可能是X
+        if (dgt[17] != (byte)(c - '0')) return false;
+        check = (short)(c - '0');
+    }
+    int 市区码 = 读取位段(dgt, 0, 6);
+    string 市 = gb2260_Dict.TryGetValue(市区码, out var cityName) ? cityName : "未知";
+    if (市 == "未知") return false; // 省市必须合法
+
+    // 建结构体
+    info.IdNumber = n;      info.SquareRoot = Math.Sqrt(n);           info.LocationCode = 市区码;              info.Province     = 省;
+    info.City     = 市;     info.BirthDate  = new DateTime(y, m, d);  info.Gender       = male ? "男" : "女";  info.CheckDigit   = check;
+    return true;
+}
+
+#!csharp
+
+// 输出到CSV文件
+File.WriteAllLines("完全平方数身份证.csv",["身份证, 平方根, 省/市代码, 出生日期, 性别, 校验码"], new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+File.AppendAllLines("完全平方数身份证.csv", results.Select(id => "\t" + id.ToString()), new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));

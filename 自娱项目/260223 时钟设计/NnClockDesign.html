@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>时钟输入与动画</title>
+	<style>
+		:root {
+			color-scheme: light dark;
+			font-family: "Segoe UI", Arial, sans-serif;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: grid;
+			place-items: center;
+			background: canvas;
+			color: canvastext;
+		}
+
+		.panel {
+			width: min(560px, 92vw);
+			padding: 20px;
+			border: 1px solid color-mix(in oklab, canvastext 25%, transparent);
+			border-radius: 12px;
+			display: grid;
+			gap: 14px;
+		}
+
+		.row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 10px;
+		}
+
+		label {
+			min-width: 100px;
+		}
+
+		input[type="time"],
+		input[type="number"] {
+			padding: 6px 8px;
+			border-radius: 8px;
+			border: 1px solid color-mix(in oklab, canvastext 30%, transparent);
+			background: canvas;
+			color: canvastext;
+		}
+
+		button {
+			padding: 7px 12px;
+			border-radius: 8px;
+			border: 1px solid color-mix(in oklab, canvastext 30%, transparent);
+			background: canvas;
+			color: canvastext;
+			cursor: pointer;
+		}
+
+		.time-display {
+			font-size: clamp(28px, 6vw, 42px);
+			font-weight: 700;
+			letter-spacing: 1px;
+			text-align: center;
+		}
+
+		.display-canvas {
+			width: min(420px, 84vw);
+			aspect-ratio: 1 / 1;
+			border-radius: 10px;
+			border: 1px solid color-mix(in oklab, canvastext 25%, transparent);
+			background: canvas;
+			color: canvastext;
+		}
+
+		.note {
+			font-size: 13px;
+			opacity: 0.75;
+		}
+	</style>
+</head>
+<body>
+	<main class="panel">
+		<div class="row">
+			<label for="timeInput">设定时间</label>
+			<input id="timeInput" type="time" step="1" value="00:00:00" />
+			<button id="setBtn" type="button">应用时间</button>
+		</div>
+
+		<div class="row">
+			<label for="speedInput">动画速度</label>
+			<input id="speedInput" type="number" min="0" step="0.1" value="60" />
+			<span>倍（1 = 实时，60 = 每秒走 1 分钟）</span>
+		</div>
+
+		<div class="row">
+			<button id="startBtn" type="button">开始</button>
+			<button id="pauseBtn" type="button">暂停</button>
+			<button id="resetBtn" type="button">重置到输入值</button>
+		</div>
+
+		<div id="timeDisplay" class="time-display">12:00:00</div>
+		<canvas id="displayCanvas" class="display-canvas" width="420" height="420"></canvas>
+	</main>
+
+	<script>
+		const timeInput = document.getElementById('timeInput');
+		const speedInput = document.getElementById('speedInput');
+		const setBtn = document.getElementById('setBtn');
+		const startBtn = document.getElementById('startBtn');
+		const pauseBtn = document.getElementById('pauseBtn');
+		const resetBtn = document.getElementById('resetBtn');
+		const timeDisplay = document.getElementById('timeDisplay');
+		const displayCanvas = document.getElementById('displayCanvas');
+		const ctx = displayCanvas.getContext('2d');
+
+		const DAY_MS = 24 * 60 * 60 * 1000;
+		const listeners = new Set();
+
+		function parseTimeToMs(timeString) {
+			const [h, m, s] = timeString.split(':').map(Number);
+			return ((h || 0) * 3600 + (m || 0) * 60 + (s || 0)) * 1000;
+		}
+
+		function msToTime(ms) {
+			const normalized = ((ms % DAY_MS) + DAY_MS) % DAY_MS;
+			const totalSeconds = Math.floor(normalized / 1000);
+			const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+			const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+			const s = String(totalSeconds % 60).padStart(2, '0');
+			return `${h}:${m}:${s}`;
+		}
+
+		function getTimeParts(ms) {
+			const normalized = ((ms % DAY_MS) + DAY_MS) % DAY_MS;
+			const totalSeconds = Math.floor(normalized / 1000);
+			const hour24 = Math.floor(totalSeconds / 3600);
+			const minute = Math.floor((totalSeconds % 3600) / 60);
+			const second = totalSeconds % 60;
+			return { hour24, minute, second };
+		}
+
+		function parseSpeedValue() {
+			const raw = speedInput.value.trim();
+			if (raw === '') {
+				return 1;
+			}
+			const parsed = Number(raw);
+			if (!Number.isFinite(parsed)) {
+				return 1;
+			}
+			return Math.max(0, parsed);
+		}
+
+		function drawDial() {
+			const w = displayCanvas.width;
+			const h = displayCanvas.height;
+			ctx.clearRect(0, 0, w, h);
+			const dialColor = getComputedStyle(displayCanvas).color || getComputedStyle(document.body).color;
+
+			const { hour24, minute, second } = getTimeParts(window.clockState.currentTimeMs);
+			const isAM = hour24 < 12;
+
+			const axisX = w - 38;
+			const contentLeft = 26;
+			const contentRight = axisX - 22;
+			const topY = 34;
+			const bottomY = h - 34;
+
+			ctx.strokeStyle = dialColor;
+			ctx.fillStyle = dialColor;
+			ctx.lineWidth = 1;
+			ctx.font = '13px "Segoe UI", Arial, sans-serif';
+
+			ctx.beginPath();
+			ctx.moveTo(axisX, topY);
+			ctx.lineTo(axisX, bottomY);
+			ctx.stroke();
+
+			for (let i = 0; i <= 12; i += 1) {
+				const ratio = i / 12;
+				const y = isAM
+					? bottomY - ratio * (bottomY - topY)
+					: topY + ratio * (bottomY - topY);
+				const tickLabel = isAM ? String(i).padStart(2, '0') : String(12 + i).padStart(2, '0');
+
+				ctx.beginPath();
+				ctx.moveTo(axisX - 7, y);
+				ctx.lineTo(axisX, y);
+				ctx.stroke();
+				ctx.fillText(tickLabel, axisX + 6, y + 4);
+			}
+
+			const hourInHalfDay = (hour24 % 12);
+			const hourRatio = hourInHalfDay / 12;
+			const hourY = isAM
+				? bottomY - hourRatio * (bottomY - topY)
+				: topY + hourRatio * (bottomY - topY);
+
+			// 左侧方向指示箭头
+			const arrowX = contentLeft - 10;
+			const arrowLen = 8;
+			const arrowColor = isAM ? '#f0c040' : '#4488cc';
+			ctx.strokeStyle = arrowColor;
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(arrowX, bottomY);
+			ctx.lineTo(arrowX, topY);
+			ctx.stroke();
+			// 箭头尖端
+			ctx.beginPath();
+			if (isAM) {
+				// AM 箭头朝上
+				ctx.moveTo(arrowX - arrowLen, topY + arrowLen);
+				ctx.lineTo(arrowX, topY);
+				ctx.lineTo(arrowX + arrowLen, topY + arrowLen);
+			} else {
+				// PM 箭头朝下
+				ctx.moveTo(arrowX - arrowLen, bottomY - arrowLen);
+				ctx.lineTo(arrowX, bottomY);
+				ctx.lineTo(arrowX + arrowLen, bottomY - arrowLen);
+			}
+			ctx.stroke();
+			// 恢复默认颜色
+			ctx.strokeStyle = dialColor;
+
+			ctx.lineWidth = 2.5;
+			ctx.beginPath();
+			ctx.moveTo(contentLeft, hourY);
+			ctx.lineTo(contentRight, hourY);
+			ctx.stroke();
+
+			const minuteLeft = contentLeft + 8;
+			const minuteRight = contentRight - 8;
+			const minuteWidth = minuteRight - minuteLeft;
+			const topGridY = topY;
+			const bottomGridY = bottomY;
+
+			ctx.lineWidth = 1;
+			ctx.font = '16px "Segoe UI", Arial, sans-serif';
+			ctx.textAlign = 'center';
+
+			ctx.beginPath();
+			ctx.moveTo(minuteLeft, topGridY);
+			ctx.lineTo(minuteRight, topGridY);
+			ctx.moveTo(minuteLeft, bottomGridY);
+			ctx.lineTo(minuteRight, bottomGridY);
+			ctx.stroke();
+
+			ctx.textBaseline = 'bottom';
+			for (let i = 0; i <= 5; i += 1) {
+				const x = minuteLeft + (minuteWidth * i) / 5;
+				ctx.fillText(String(i), x, topGridY - 6);
+			}
+
+			ctx.textBaseline = 'top';
+			for (let i = 0; i <= 9; i += 1) {
+				const x = minuteLeft + (minuteWidth * i) / 9;
+				ctx.fillText(String(i), x, bottomGridY + 6);
+			}
+
+			ctx.textAlign = 'start';
+			ctx.textBaseline = 'alphabetic';
+
+			const minuteTens = Math.floor(minute / 10);
+			const minuteUnits = minute % 10;
+			const topX = minuteLeft + (minuteWidth * minuteTens) / 5;
+			const bottomX = minuteLeft + (minuteWidth * minuteUnits) / 9;
+
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(topX, topGridY);
+			ctx.lineTo(bottomX, bottomGridY);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.arc(topX, topGridY, 3, 0, Math.PI * 2);
+			ctx.arc(bottomX, bottomGridY, 3, 0, Math.PI * 2);
+			ctx.fill();
+		}
+
+		function notify() {
+			timeDisplay.textContent = msToTime(window.clockState.currentTimeMs);
+			drawDial();
+			for (const callback of listeners) {
+				callback(window.clockState);
+			}
+		}
+
+		window.clockState = {
+			currentTimeMs: parseTimeToMs(timeInput.value),
+			speed: parseSpeedValue(),
+			isRunning: false,
+			lastFrameTimestamp: 0
+		};
+
+		window.onClockTick = function (callback) {
+			listeners.add(callback);
+			return function unsubscribe() {
+				listeners.delete(callback);
+			};
+		};
+
+		function setFromInput() {
+			window.clockState.currentTimeMs = parseTimeToMs(timeInput.value);
+			notify();
+		}
+
+		function loop(timestamp) {
+			if (!window.clockState.isRunning) {
+				return;
+			}
+
+			if (window.clockState.lastFrameTimestamp === 0) {
+				window.clockState.lastFrameTimestamp = timestamp;
+			}
+
+			const rawDelta = timestamp - window.clockState.lastFrameTimestamp;
+			window.clockState.lastFrameTimestamp = timestamp;
+			window.clockState.speed = parseSpeedValue();
+
+			const deltaRealMs = Math.min(Math.max(rawDelta, 0), 1000);
+			window.clockState.currentTimeMs += deltaRealMs * window.clockState.speed;
+			window.clockState.currentTimeMs = ((window.clockState.currentTimeMs % DAY_MS) + DAY_MS) % DAY_MS;
+
+			notify();
+			requestAnimationFrame(loop);
+		}
+
+		setBtn.addEventListener('click', setFromInput);
+
+		startBtn.addEventListener('click', function () {
+			window.clockState.speed = parseSpeedValue();
+			if (window.clockState.isRunning) {
+				return;
+			}
+			window.clockState.isRunning = true;
+			window.clockState.lastFrameTimestamp = 0;
+			requestAnimationFrame(loop);
+		});
+
+		pauseBtn.addEventListener('click', function () {
+			window.clockState.isRunning = false;
+			window.clockState.lastFrameTimestamp = 0;
+		});
+
+		resetBtn.addEventListener('click', function () {
+			setFromInput();
+			window.clockState.lastFrameTimestamp = 0;
+		});
+
+		speedInput.addEventListener('change', function () {
+			window.clockState.speed = parseSpeedValue();
+		});
+
+		timeInput.addEventListener('change', function () {
+			if (!window.clockState.isRunning) {
+				setFromInput();
+			}
+		});
+
+		notify();
+	</script>
+</body>
+</html>
