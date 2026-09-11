@@ -343,9 +343,61 @@
         grid-template-columns: 1fr;
       }
 
-      @media (max-width: 760px) {
+      @media (max-width: 330px) {
         .honor-wrap {
           grid-template-columns: 1fr;
+        }
+      }
+
+      /* 手机：并排后列变窄，整体再收一档，尽量让每条保持一行 */
+      @media (max-width: 600px) {
+        .honor-wrap {
+          gap: 0.5rem;
+        }
+
+        .honor-card {
+          padding: 0 0.55rem 0.5rem;
+        }
+
+        .honor-head {
+          margin: 0 -0.55rem;
+          padding: 0.45rem 0.55rem 0.25rem;
+          gap: 0.35rem;
+        }
+
+        .honor-head::before {
+          left: 0.55rem;
+          width: 3.5rem;
+        }
+
+        .honor-title {
+          font-size: 0.9rem;
+        }
+
+        .honor-count {
+          padding: 0.05rem 0.4rem;
+          font-size: 0.65rem;
+        }
+
+        .honor-item {
+          padding: 0.1rem 0.25rem;
+          gap: 0.25rem;
+          font-size: 0.82rem;
+        }
+
+        .honor-item::before {
+          min-width: 0.9rem;
+          font-size: 0.62rem;
+        }
+
+        .honor-note {
+          padding: 0 0.28rem;
+          font-size: 0.62rem;
+        }
+
+        .honor-toggle {
+          padding: 0.2rem 0.4rem;
+          font-size: 0.68rem;
         }
       }
 
@@ -834,7 +886,7 @@
           </ol>
           <button class="honor-toggle" type="button" hidden aria-expanded="false"></button>
         </section>
-        <section class="honor-card honor-compact" data-honor="army" data-rows="4">
+        <section class="honor-card honor-compact" data-honor="army" data-rows="4" data-min-cols="2">
           <header class="honor-head">
             <h2 class="honor-title">拳师水军<span class="comment_s honor-joke">(笑)</span></h2>
             <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
@@ -885,6 +937,7 @@
             const btn = card.querySelector(".honor-toggle");
             const close = card.querySelector(".honor-close");
             const rowLimit = card.dataset.rows ? Number(card.dataset.rows) : 0;
+            const minCols = card.dataset.minCols ? Number(card.dataset.minCols) : 1;
             const itemLimit = card.dataset.limit === undefined ? DEFAULT_LIMIT : Number(card.dataset.limit);
 
             card.querySelector(".honor-count").textContent = `共 ${items.length}`;
@@ -899,8 +952,14 @@
               const open = card.classList.contains("is-open");
               const unit = remPx();
               const gap = COL_GAP_REM * unit;
-              const cols = Math.max(1, Math.floor((list.clientWidth + gap) / (MIN_COL_REM * unit + gap)));
-              const limit = rowLimit ? rowLimit * cols : itemLimit;
+              let cols = Math.max(1, Math.floor((list.clientWidth + gap) / (MIN_COL_REM * unit + gap)));
+              let maxRows = rowLimit;
+              // 窄屏下强制铺够列数（如拳师水军的 2×2），条目总数保持不变
+              if (cols < minCols) {
+                cols = minCols;
+                if (rowLimit) maxRows = Math.max(1, Math.round(rowLimit / minCols));
+              }
+              const limit = maxRows ? maxRows * cols : itemLimit;
               const overflow = Math.max(0, items.length - limit);
 
               items.forEach((li, i) => (li.hidden = !open && i >= limit));
