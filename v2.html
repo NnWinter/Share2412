@@ -6,8 +6,8 @@
     <style>
       /* 采用类Github 色系 */
       body {
-        background-color: #0d1117;
-        color: #c9d1d9;
+        background-color: var(--bg);
+        color: var(--text);
         font-family: "Microsoft Yahei UI", "Microsoft Yahei", "-apple-system", "BlinkMacSystemFont", "Segoe UI", Helvetica, Arial, sans-serif;
         margin: 2em;
         line-height: 1.6;
@@ -17,7 +17,7 @@
         color: inherit;
         text-decoration: none;
         position: relative;
-        color: #62adf8;
+        color: var(--accent);
       }
 
       html {
@@ -33,7 +33,7 @@
       a:hover {
         /* text-decoration: underline;  鼠标悬停提示 */
         /* 算了不加下横线, 颜色已经很明显, 下横线影响看字 */
-        color: #e57c2f;
+        color: var(--accent-warm);
         /* #9d5207; 这互补色太暗, 亮度一致一下*/
       }
     </style>
@@ -48,13 +48,31 @@
         position: relative;
         display: inline-block;
         color: transparent;
-        background-color: #3333;
+        background-color: var(--censor);
+        border-radius: 0.25rem;
+        padding: 0 0.2em;
         cursor: pointer;
+      }
+
+      .censored :where(a, s, sub, sup, span) {
+        color: inherit;
+      }
+
+      .censored:not(:hover) :where(s, del) {
+        text-decoration: none;
       }
 
       .censored:hover {
         color: inherit;
         background-color: transparent;
+      }
+
+      .censored:hover a {
+        color: var(--accent);
+      }
+
+      .censored:hover a:hover {
+        color: var(--accent-warm);
       }
 
       .center {
@@ -66,7 +84,7 @@
       }
 
       .tb1 {
-        border: 2pt solid #30363d;
+        border: 1px solid var(--line);
         border-collapse: collapse;
         font-size: 0.8rem;
         margin: 0 auto;
@@ -74,16 +92,16 @@
       }
 
       .tb1 > tbody > tr > td {
-        border: 1pt solid #30363d;
+        border: 1px solid var(--line-soft);
       }
 
       .tb1 > thead th {
-        border: 1.5pt solid #30363d;
+        border: 1px solid var(--line);
       }
 
       .tb1 > tbody > tr:nth-of-type(even),
       .tb1 > thead {
-        background-color: #161b22;
+        background-color: var(--surface-2);
       }
 
       .tb1 > tbody > tr > td {
@@ -97,7 +115,7 @@
       .视频标题 {
         font-size: 1.085rem;
         line-height: 1.05em;
-        color: #ececec;
+        color: var(--text-strong);
         text-align: left;
         padding-top: 0.2em;
         padding-bottom: 0.2em;
@@ -106,14 +124,14 @@
 
       .视频标题_超 {
         font-size: 0.75rem;
-        color: #c2c2c2;
+        color: var(--text-dim);
         line-height: 0.8em;
         text-align: left;
       }
 
       .视频时间 {
         font-size: 0.75rem;
-        color: #d6d6d6;
+        color: var(--text-soft);
         position: relative;
       }
 
@@ -129,32 +147,32 @@
       .注 {
         font-family: "Microsoft YaHei", "PingFang SC", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
         font-size: 0.75rem;
-        color: #d6d6d6;
+        color: var(--text-soft);
       }
 
       .comment_m {
         font-size: 0.8rem;
-        color: gray;
+        color: var(--text-dim);
         line-height: 1rem;
       }
       .comment_s {
         font-size: 0.6rem;
-        color: gray;
+        color: var(--text-dim);
         line-height: 1rem;
       }
 
       hr {
         border: none;
-        border-top: 1pt solid #869fb9;
+        border-top: 1px solid var(--line);
       }
 
       .mini {
         font-size: 0.6rem;
-        color: gray;
+        color: var(--text-dim);
       }
       .mini2 {
         font-size: 0.4rem;
-        color: gray;
+        color: var(--text-dim);
       }
 
       .supermini {
@@ -163,7 +181,517 @@
       }
 
       .无效链接 {
-        color: #a4b6c9;
+        color: var(--text-dim);
+      }
+    </style>
+    <style>
+      :root {
+        --m-blue: #2e9bd6;
+        --m-navy: #16588e;
+        --m-red: #e7222e;
+
+        --bg: #f2f4f7;
+        --bg-deep: #e9edf2;
+        --surface: #ffffff;
+        --surface-2: #f6f8fb;
+        --surface-3: #e9f1f9;
+        --line: #d3dae3;
+        --line-soft: #e4e9ef;
+
+        --text: #2c3440;
+        --text-strong: #0f1722;
+        --text-soft: #4b5563;
+        --text-dim: #79838f;
+
+        --accent: #0066b1;
+        --accent-2: var(--m-navy);
+        --accent-3: var(--m-blue);
+        --accent-red: var(--m-red);
+        --accent-warm: #c8102e;
+
+        --censor: #c6ccd4;
+        --radius: 0.85rem;
+        --radius-sm: 0.5rem;
+        --shadow: 0 1px 2px #0f172214, 0 10px 26px -18px #0f172259;
+        --stripe: linear-gradient(90deg, var(--m-blue) 0 33.33%, var(--m-navy) 33.33% 66.66%, var(--m-red) 66.66%);
+      }
+
+      body {
+        max-width: 78rem;
+        margin: 0 auto;
+        padding: 1rem 1.25rem 2rem;
+        -webkit-font-smoothing: antialiased;
+        background-image: radial-gradient(70rem 30rem at 50% -12rem, #2e9bd626, transparent 70%), radial-gradient(48rem 24rem at 100% 0%, #0066b114, transparent 70%);
+        background-attachment: fixed;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 0.9rem 0.75rem 1.5rem;
+        }
+      }
+
+      ::selection {
+        background: #2e9bd63d;
+      }
+
+      #title {
+        font-size: 1.4rem;
+        letter-spacing: 0.08em;
+        margin-bottom: 0;
+        background: linear-gradient(92deg, var(--m-navy), var(--accent) 55%, var(--m-blue));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      hr {
+        border-top: 1px solid var(--line);
+        margin: 0.5rem 0;
+      }
+
+      .intro {
+        background: var(--surface);
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        padding: 0.45rem 0.8rem;
+        font-size: 0.82rem;
+        line-height: 1.35;
+        box-shadow: var(--shadow);
+      }
+
+      .intro .comment_m {
+        margin-top: 0.3rem;
+        padding-top: 0.3rem;
+        font-size: 0.75rem;
+        line-height: 1.35;
+        border-top: 1px dashed var(--line);
+      }
+
+      .intro-v1 {
+        font-size: 0.82rem;
+      }
+
+      @media (min-width: 761px) {
+        .intro {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: 0 1.1rem;
+          align-items: start;
+        }
+
+        .intro .comment_m {
+          margin-top: 0;
+          padding-top: 0;
+          border-top: none;
+        }
+
+        .intro-side {
+          padding-left: 1.1rem;
+          border-left: 1px dashed var(--line);
+        }
+      }
+
+      details > summary {
+        cursor: pointer;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        width: fit-content;
+        list-style: none;
+        user-select: none;
+      }
+      details > summary::before {
+        content: "▸";
+        display: inline-block;
+        margin-right: 0.35rem;
+        transition: transform 0.15s ease;
+      }
+      details[open] > summary::before {
+        transform: rotate(90deg);
+      }
+      details > summary:hover {
+        color: var(--accent);
+      }
+
+      .section-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        letter-spacing: 0.1em;
+        color: var(--text-strong);
+        padding-bottom: 0.35rem;
+      }
+
+      .section-title::after {
+        content: "";
+        display: block;
+        width: 4rem;
+        height: 3px;
+        margin: 0.35rem auto 0;
+        border-radius: 2px;
+        background: var(--stripe);
+      }
+
+      .honor-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.7rem;
+        align-items: stretch;
+      }
+
+      .honor-wrap.is-any-open {
+        grid-template-columns: 1fr;
+      }
+
+      @media (max-width: 760px) {
+        .honor-wrap {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .honor-card[data-honor="army"] {
+        grid-column: 1 / -1;
+      }
+
+      .honor-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        padding: 0 0.85rem 0.6rem;
+        box-shadow: var(--shadow);
+      }
+
+      .honor-head {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 -0.85rem;
+        padding: 0.5rem 0.85rem 0.3rem;
+        background: var(--surface);
+        border-radius: var(--radius) var(--radius) 0 0;
+        border-bottom: 1px solid var(--line-soft);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .honor-head::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0.85rem;
+        width: 5rem;
+        height: 3px;
+        border-radius: 0 0 2px 2px;
+        background: var(--stripe);
+      }
+
+      .honor-card.is-open .honor-head {
+        position: sticky;
+        top: 0;
+        z-index: 6;
+      }
+
+      .honor-card.is-open .honor-head.is-stuck {
+        border-bottom-color: var(--line);
+        margin-bottom: 0;
+        box-shadow: 0 6px 14px -10px #0f172266;
+      }
+
+      .honor-title {
+        flex: 1 1 auto;
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: var(--text-strong);
+        letter-spacing: 0.05em;
+      }
+
+      .honor-joke {
+        margin-left: 0.25rem;
+        vertical-align: 0.15em;
+      }
+
+      .honor-count {
+        flex: none;
+        font-size: 0.72rem;
+        color: var(--text-soft);
+        background: var(--bg-deep);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.08rem 0.6rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .honor-close {
+        flex: none;
+        background: var(--surface);
+        color: var(--accent);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.1rem 0.7rem;
+        font: inherit;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: background-color 0.12s ease, border-color 0.12s ease;
+      }
+
+      .honor-close:hover {
+        background: var(--surface-3);
+        border-color: var(--accent);
+      }
+
+      .honor-sub {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin: 0;
+        font-size: 0.66rem;
+        color: var(--text-dim);
+        letter-spacing: 0.03em;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .honor-sub {
+          display: none;
+        }
+      }
+
+      .honor-sub-dot {
+        width: 0.35rem;
+        height: 0.35rem;
+        border-radius: 50%;
+        background: var(--m-blue);
+        box-shadow: 0 0 0 2px #2e9bd633;
+      }
+
+      .honor-list {
+        list-style: none;
+        counter-reset: honor;
+        margin: 0.35rem 0 0.45rem;
+        padding: 0;
+        display: grid;
+        gap: 0.1rem 0.6rem;
+      }
+
+      .honor-item {
+        counter-increment: honor;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.35rem;
+        padding: 0.1rem 0.4rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        line-height: 1.3;
+        transition: background-color 0.12s ease;
+      }
+
+      .honor-item[hidden] {
+        display: none;
+      }
+
+      .honor-item:hover {
+        background-color: var(--surface-3);
+      }
+
+      .honor-item::before {
+        content: counter(honor);
+        flex: none;
+        min-width: 1.35rem;
+        text-align: right;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .honor-item:nth-child(-n + 3)::before {
+        color: var(--m-red);
+        font-weight: bold;
+      }
+
+      .honor-note {
+        font-size: 0.68rem;
+        color: var(--text-soft);
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.02rem 0.45rem;
+        white-space: nowrap;
+      }
+
+      .honor-tag {
+        cursor: help;
+        color: var(--m-navy);
+        background: var(--surface-3);
+        border-color: #2e9bd659;
+      }
+
+      .has-tip {
+        cursor: help;
+        text-decoration: underline dotted var(--line);
+        text-underline-offset: 0.18em;
+      }
+
+      .tip-pop {
+        position: absolute;
+        z-index: 100;
+        max-width: 22rem;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.72rem;
+        line-height: 1.5;
+        text-align: left;
+        color: #fff;
+        background: var(--text-strong);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 10px 24px -12px #0f1722a6;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s ease;
+      }
+
+      .tip-pop.is-on {
+        opacity: 1;
+      }
+
+      @media (max-width: 600px) {
+        .tip-pop {
+          max-width: 14rem;
+        }
+      }
+
+      .honor-toggle {
+        margin-top: auto;
+        width: 100%;
+        background: var(--surface-2);
+        color: var(--text-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 0.22rem 0.6rem;
+        font: inherit;
+        font-size: 0.73rem;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: color 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+      }
+
+      .honor-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--surface-3);
+      }
+
+      .honor-compact {
+        padding: 0 0.7rem;
+      }
+
+      .honor-compact.is-open {
+        padding-bottom: 0.6rem;
+      }
+
+      .honor-compact .honor-head {
+        margin: 0 -0.7rem;
+        padding: 0.25rem 0.7rem;
+        gap: 0.45rem;
+      }
+
+      .honor-compact .honor-head::before {
+        left: 0.7rem;
+        width: 3.5rem;
+      }
+
+      .honor-compact .honor-title {
+        font-size: 0.88rem;
+      }
+
+      .honor-compact .honor-empty {
+        display: none;
+      }
+
+      .honor-compact .honor-toggle {
+        flex: none;
+        width: auto;
+        margin: 0;
+        padding: 0.05rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+      }
+
+      .honor-empty {
+        margin: 0.35rem 0 0.5rem;
+        padding: 0.4rem;
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        background: var(--surface-2);
+        border: 1px dashed var(--line);
+        border-radius: var(--radius-sm);
+      }
+
+      .tb1 {
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .pager {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        margin-top: 1rem;
+      }
+
+      .pager-info {
+        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        margin-bottom: 0.15rem;
+      }
+
+      .pager button {
+        min-width: 2rem;
+        background: var(--surface);
+        color: var(--text-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 0.25rem 0.6rem;
+        font: inherit;
+        font-size: 0.8rem;
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition: color 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+      }
+
+      .pager button:hover:not(:disabled) {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--surface-3);
+      }
+
+      .pager button[aria-current="page"] {
+        color: #fff;
+        background: var(--accent);
+        border-color: var(--accent);
+        font-weight: bold;
+      }
+
+      .pager button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .pager-gap {
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        padding: 0 0.15rem;
       }
     </style>
     <script>
@@ -178,10 +706,14 @@
     <div>
       <div id="title">已归档的视频</div>
       <hr class="hr" />
-      视频可以通过点击 <q><b>ID</b></q> 的蓝色编号 打开链接查看原视频<br />
-      有建议和想要备份的视频可以在issue/<a href="https://t.me/NnWinter">TG群</a>里提<br />
-      含 视频 评论 XML弹幕
-      <span style="font-size: 0.8rem">(但为了保护用户隐私, 评论文件在匿名化前不会公开)</span>
+      <div class="intro">
+        <div class="intro-main">
+          视频可以通过点击 <q><b>ID</b></q> 的蓝色编号 打开链接查看原视频<br />
+          有建议和想要备份的视频可以在issue/<a href="https://t.me/NnWinter">TG群</a>里提<br />
+          含 视频 评论 XML弹幕
+          <span style="font-size: 0.8rem">(但为了保护用户隐私, 评论文件在匿名化前不会公开)</span>
+        </div>
+        <div class="intro-side">
       <div class="comment_m">
         备份是因为这些视频容易被下架。仅用于学习交流，记录历史，并不代表支持视频中的内容。
         <br />不建议进行网暴，有个别是心智不成熟的小孩子，网暴后果自负。
@@ -196,125 +728,239 @@
           24/12/03 由于Github空间不足<span class="censored">+资金不足</span>，不再提供视频预览，而是直接上传原始视频到TG，点击归档编号前往查看
         </div>
       </details>
-      <div style="font-size: 1rem">这里只包含v2版内容, 另 251项 内容见：<a href="https://github.com/NnWinter/Bilibili_Shared/tree/main/Archive">v1版</a></div>
-      <hr />
-      <div>
-        <!--某种意义上算出来的居中-->
-        <div style="display: inline-block; position: relative; padding-bottom: 0.2rem; width: 7rem; text-align: center; left: calc(50% - 3.5rem)">逆天UP荣誉榜</div>
-        <div class="comment_s" style="display: inline; position: relative; width: 0.12rem; text-align: center; left: calc((100% + 7rem) * 0.5 - 7.5rem)">(笑)</div>
-        <!-- 每行最多3个td -->
-        <table class="tb1 center" style="margin-bottom: 0.3rem">
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/474016968">嗷老虎钳子</a>
-              <span class="comment_s">图文动态</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/1152917428">surfdog</a>
-              <span class="comment_s">视频,控评,对立</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/3546928501491749">喵喵布丁烧</a>
-              <span class="comment_s">视频性别叙事</span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/423867404">养猫自由</a>
-              <span class="comment_s">视频,评论</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/3493278068509496">伽蓝说说</a>
-              <span class="comment_s">视频</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/3546608572566011">哼哼哈嘿嗯1</a>
-              <span class="comment_s">视频</span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/95055851">暴裂皇后</a>
-              <span class="comment_s">视频</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/505309060">响响__</a>
-              <span class="comment_s">置顶,点赞厌男评论</span>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/1163310693">茶呆呆吖</a>
-              <span class="comment_s">视频及评论打拳</span>
-            </td>
-          </tr>
-        </table>
-        <!--某种意义上算出来的居中2-->
-        <div style="display: inline-block; position: relative; padding-bottom: 0.2rem; width: 7rem; text-align: center; left: calc(50% - 3.5rem)">逆天人荣誉榜</div>
-        <div class="comment_s" style="display: inline; position: relative; width: 0.12rem; text-align: center; left: calc((100% + 7rem) * 0.5 - 7.5rem)">(笑)</div>
-        <!-- 每行最多5个td (无附注，后续可以考虑加在鼠标hover) -->
-        <table id="nitian" class="tb1 center">
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/174500658">伯恩山洗澡爱唱歌</a>
-            </td>
-            <td><a href="https://space.bilibili.com/1843614072">千島赤</a></td>
-            <td><a href="https://space.bilibili.com/196496489">行早</a></td>
-            <td>
-              <a href="https://space.bilibili.com/309570891">-OBAFGKM-</a>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/481372978">丘神纪的小媳妇</a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/3546387885066751">孔子女士大义</a>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/493019712">6个硬币好多啊</a>
-            </td>
-            <td>
-              <s class="censored"><a href="https://space.bilibili.com/686504719" class="censored">狸子狸子雨</a><sub>(低龄)</sub></s>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/1360393249">帽子红酒君</a>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/517547994">世界的则律</a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a href="https://space.bilibili.com/697817761">齐木楠雄sk-</a>
-              <div class="mini">
-                言论：
-                <div class="supermini">剑♂🐶的天赋吧[点赞]。看到女生和洋人就发情了忘狠了造谣了赛博刚交传成人体蜈蚣了[星星眼]或者说因为一个跪舔留学生的二本是你们爹[嘘声]</div>
-              </div>
-            </td>
-            <td>
-              <a href="https://space.bilibili.com/36043765">没钱的吸血鬼</a>
-              <div class="mini2">"整个男生群体被小红书喷其实也不是没有道理"</div>
-            </td>
-          </tr>
-        </table>
+      <div class="intro-v1">这里只包含v2版内容, 另 251项 内容见：<a href="https://github.com/NnWinter/Bilibili_Shared/tree/main/Archive">v1版</a></div>
+        </div>
       </div>
+      <hr />
+      <div id="honor" class="honor-wrap">
+        <section class="honor-card" data-honor="up">
+          <header class="honor-head">
+            <h2 class="honor-title">逆天UP荣誉榜<span class="comment_s honor-joke">(笑)</span></h2>
+            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-count"></span>
+            <button class="honor-close" type="button" hidden>收起 ▲</button>
+          </header>
+          <ol class="honor-list">
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/1163310693">茶呆呆吖</a>
+              <span class="honor-note">视频及评论打拳</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/505309060">响响__</a>
+              <span class="honor-note">置顶,点赞厌男评论</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/95055851">暴裂皇后</a>
+              <span class="honor-note">视频</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/3546608572566011">哼哼哈嘿嗯1</a>
+              <span class="honor-note">视频</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/3493278068509496">伽蓝说说</a>
+              <span class="honor-note">视频</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/423867404">养猫自由</a>
+              <span class="honor-note">视频,评论</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/3546928501491749">喵喵布丁烧</a>
+              <span class="honor-note">视频性别叙事</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/1152917428">surfdog</a>
+              <span class="honor-note">视频,控评,对立</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/474016968">嗷老虎钳子</a>
+              <span class="honor-note">图文动态</span>
+            </li>
+          </ol>
+          <button class="honor-toggle" type="button" hidden aria-expanded="false"></button>
+        </section>
+
+        <section class="honor-card" data-honor="person">
+          <header class="honor-head">
+            <h2 class="honor-title">逆天人荣誉榜<span class="comment_s honor-joke">(笑)</span></h2>
+            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-count"></span>
+            <button class="honor-close" type="button" hidden>收起 ▲</button>
+          </header>
+          <ol class="honor-list">
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/36043765">没钱的吸血鬼</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="&quot;整个男生群体被小红书喷其实也不是没有道理&quot;">言论</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/697817761">齐木楠雄sk-</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="剑♂🐶的天赋吧[点赞]。看到女生和洋人就发情了忘狠了造谣了赛博刚交传成人体蜈蚣了[星星眼]或者说因为一个跪舔留学生的二本是你们爹[嘘声]">言论</span>
+            </li>
+            <li class="honor-item"><a href="https://space.bilibili.com/517547994">世界的则律</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/1360393249">帽子红酒君</a></li>
+            <li class="honor-item">
+              <span class="censored"><s><a href="https://space.bilibili.com/686504719">狸子狸子雨</a><sub>(低龄)</sub></s></span>
+            </li>
+            <li class="honor-item"><a href="https://space.bilibili.com/493019712">6个硬币好多啊</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/3546387885066751">孔子女士大义</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/481372978">丘神纪的小媳妇</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/309570891">-OBAFGKM-</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/196496489">行早</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/1843614072">千島赤</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/174500658">伯恩山洗澡爱唱歌</a></li>
+          </ol>
+          <button class="honor-toggle" type="button" hidden aria-expanded="false"></button>
+        </section>
+        <section class="honor-card honor-compact" data-honor="army" data-rows="4">
+          <header class="honor-head">
+            <h2 class="honor-title">拳师水军<span class="comment_s honor-joke">(笑)</span></h2>
+            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-count"></span>
+            <button class="honor-toggle" type="button" aria-expanded="false"></button>
+          </header>
+          <ol class="honor-list">
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/435464839">淡奶油红茶</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="疑似有组织团体在冷门视频下集体评论">网暴水军</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/478993939">黑猫警长只是在说</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="疑似有组织团体在冷门视频下集体评论">网暴水军</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/666747581">_自然树</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="疑似有组织团体在冷门视频下集体评论">网暴水军</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/214667162">秦斩丶渡</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="疑似有组织团体在冷门视频下集体评论">网暴水军</span>
+            </li>
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/532979780">月下冰坨连一片</a>
+              <span class="honor-note honor-tag" tabindex="0" data-tip="发表极端言论但发现自己不占理后叫其它人一起来网暴">极端女权</span>
+            </li>
+          </ol>
+          <p class="honor-empty" hidden>暂无内容</p>
+        </section>
+      </div>
+
+      <script>
+        (function () {
+          const DEFAULT_LIMIT = 5;
+          const MIN_COL_REM = 16;
+          const COL_GAP_REM = 0.6;
+          const wrap = document.getElementById("honor");
+          const cards = [...wrap.querySelectorAll(".honor-card")];
+          const syncs = [];
+
+          const remPx = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+
+          cards.forEach((card) => {
+            const items = [...card.querySelectorAll(".honor-item")];
+            const list = card.querySelector(".honor-list");
+            const empty = card.querySelector(".honor-empty");
+            const btn = card.querySelector(".honor-toggle");
+            const close = card.querySelector(".honor-close");
+            const rowLimit = card.dataset.rows ? Number(card.dataset.rows) : 0;
+            const itemLimit = card.dataset.limit === undefined ? DEFAULT_LIMIT : Number(card.dataset.limit);
+
+            card.querySelector(".honor-count").textContent = `共 ${items.length}`;
+            if (empty) empty.hidden = items.length > 0;
+            if (!items.length) {
+              if (btn) btn.hidden = true;
+              if (close) close.hidden = true;
+              return;
+            }
+
+            const sync = () => {
+              const open = card.classList.contains("is-open");
+              const unit = remPx();
+              const gap = COL_GAP_REM * unit;
+              const cols = Math.max(1, Math.floor((list.clientWidth + gap) / (MIN_COL_REM * unit + gap)));
+              const limit = rowLimit ? rowLimit * cols : itemLimit;
+              const overflow = Math.max(0, items.length - limit);
+
+              items.forEach((li, i) => (li.hidden = !open && i >= limit));
+
+              const shown = open ? items.length : Math.min(limit, items.length);
+              const rows = Math.max(1, Math.ceil(shown / cols));
+              list.style.gridTemplateColumns = cols > 1 ? `repeat(${cols}, minmax(0, 1fr))` : "";
+              list.style.gridTemplateRows = cols > 1 ? `repeat(${rows}, auto)` : "";
+              list.style.gridAutoFlow = cols > 1 ? "column" : "";
+
+              if (btn) {
+                btn.hidden = !overflow && !open;
+                btn.textContent = open ? "收起" : `展开全部 (+${overflow})`;
+                btn.setAttribute("aria-expanded", String(open));
+              }
+              if (close) close.hidden = !open;
+              wrap.classList.toggle(
+                "is-any-open",
+                cards.some((c) => c.classList.contains("is-open"))
+              );
+            };
+
+            const toggle = (open) => {
+              card.classList.toggle("is-open", open);
+              syncs.forEach((fn) => fn());
+              if (!open && card.getBoundingClientRect().top < 0) {
+                card.scrollIntoView({ block: "start" });
+              }
+            };
+
+            if (btn) btn.addEventListener("click", () => toggle(!card.classList.contains("is-open")));
+            if (close) close.addEventListener("click", () => toggle(false));
+            syncs.push(sync);
+            sync();
+          });
+
+          let resizeTimer;
+          window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => syncs.forEach((fn) => fn()), 120);
+          });
+
+          const heads = cards.map((c) => c.querySelector(".honor-head"));
+          let ticking = false;
+          const onScroll = () => {
+            ticking = false;
+            heads.forEach((head) => {
+              const card = head.parentElement;
+              const rect = head.getBoundingClientRect();
+              const stuck = card.classList.contains("is-open") && rect.top <= 1 && card.getBoundingClientRect().bottom > rect.height;
+              head.classList.toggle("is-stuck", stuck);
+            });
+          };
+          window.addEventListener(
+            "scroll",
+            () => {
+              if (ticking) return;
+              ticking = true;
+              requestAnimationFrame(onScroll);
+            },
+            { passive: true }
+          );
+        })();
+      </script>
     </div>
     <hr />
-    <div class="center" style="padding-bottom: 0.3rem; font-weight: bold; font-size: 1.6rem">视频备份</div>
+    <div class="section-title">视频备份</div>
 
     <div id="archive" role="table" aria-label="视频归档列表">
       <div id="archive-header" role="row">
-        <div role="columnheader" style="color: #ebebeb">ID</div>
-        <div role="columnheader" style="color: #ebebeb">
+        <div role="columnheader" style="color: var(--text-strong)">ID</div>
+        <div role="columnheader" style="color: var(--text-strong)">
           <div>视频</div>
           <sub style="position: absolute; font-size: 0.6em; margin-top: 3.5em; padding-left: 0.35em; font-weight: normal">点击可跳转</sub>
         </div>
-        <div role="columnheader" style="color: #ebebeb">
+        <div role="columnheader" style="color: var(--text-strong)">
           <div style="line-height: 1.2rem">
             <div style="padding-left: 0.95rem; padding-bottom: 0.2rem">时间<sup style="font-size: 0.7rem">+8</sup></div>
             <div>作者</div>
           </div>
         </div>
-        <div role="columnheader" style="color: #ebebeb">备注</div>
+        <div role="columnheader" style="color: var(--text-strong)">备注</div>
       </div>
       <div role="row">
         <div role="cell">
@@ -3107,6 +3753,8 @@
       </div>
     </div>
 
+    <nav id="archive-pager" class="pager" aria-label="视频备份分页"></nav>
+
     <div>
       <style>
         #archive {
@@ -3116,8 +3764,12 @@
           margin: 0 auto;
           gap: 1px;
           text-align: center;
-          outline: 0.2rem solid #30363d;
           font-size: 1rem;
+          background: var(--line-soft);
+          border: 1px solid var(--line);
+          border-radius: var(--radius);
+          overflow: hidden;
+          box-shadow: var(--shadow);
         }
 
         @media (max-width: 600px) {
@@ -3133,7 +3785,7 @@
 
         #archive > div[role="row"]:nth-of-type(1) div[role="columnheader"] {
           font-weight: bold;
-          color: #fff;
+          color: var(--text-strong);
           display: flex;
           align-items: center;
           /* 垂直居中 */
@@ -3159,19 +3811,25 @@
           flex-direction: column;
         }
 
-        /* 线框 */
-        #archive > div[role="row"] > div[role="columnheader"] {
-          outline: 0.15rem solid #30363d;
-        }
-
         #archive div[role="row"] > div {
-          outline: 0.05rem solid #30363d;
-          outline-offset: -0.5px;
-          outline-width: 0.1rem;
+          background-color: var(--surface);
+          transition: background-color 0.12s ease;
         }
 
-        #archive div[role="row"]:nth-of-type(odd) > div {
-          background-color: #161b22;
+        #archive div[role="row"].is-alt > div {
+          background-color: var(--surface-2);
+        }
+
+        #archive > div[role="row"][hidden] {
+          display: none;
+        }
+
+        #archive > div[role="row"] > div[role="columnheader"] {
+          background: linear-gradient(180deg, var(--surface-3), var(--surface-2));
+        }
+
+        #archive > div[role="row"]:hover > div[role="cell"] {
+          background-color: var(--surface-3);
         }
       </style>
 
@@ -3221,8 +3879,10 @@
           bottom: 100%;
           /* 上方显示 */
           left: 0;
-          background: #333;
-          color: white;
+          background: var(--text-strong);
+          color: #fff;
+          box-shadow: 0 10px 24px -12px #0f1722a6;
+          z-index: 10;
           padding: 0.2rem 0.6rem;
           border-radius: 0.4rem;
           font-size: 0.8rem;
@@ -3247,10 +3907,88 @@
           }
         });
       </script>
+      <script>
+        (function () {
+          const PER_PAGE = 100;
+          const archive = document.getElementById("archive");
+          const pager = document.getElementById("archive-pager");
+          const rows = [...archive.querySelectorAll(':scope > div[role="row"]')].filter((r) => r.id !== "archive-header");
+          const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+          let current = 1;
+
+          const postHeight = () => {
+            parent.postMessage({ type: "setIframeHeight", height: document.documentElement.scrollHeight }, "*");
+          };
+
+          const button = (label, { page, disabled, currentPage, gap } = {}) => {
+            if (gap) {
+              const span = document.createElement("span");
+              span.className = "pager-gap";
+              span.textContent = "…";
+              return span;
+            }
+            const b = document.createElement("button");
+            b.type = "button";
+            b.textContent = label;
+            if (disabled) b.disabled = true;
+            if (currentPage) b.setAttribute("aria-current", "page");
+            if (page) b.addEventListener("click", () => go(page, true));
+            return b;
+          };
+
+          const pageNumbers = () => {
+            const set = new Set([1, pages, current, current - 1, current + 1]);
+            const list = [...set].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+            const out = [];
+            list.forEach((n, i) => {
+              if (i && n - list[i - 1] > 1) out.push(null);
+              out.push(n);
+            });
+            return out;
+          };
+
+          const renderPager = () => {
+            pager.textContent = "";
+            if (pages <= 1) return;
+
+            const from = (current - 1) * PER_PAGE + 1;
+            const to = Math.min(current * PER_PAGE, rows.length);
+            const info = document.createElement("div");
+            info.className = "pager-info";
+            info.textContent = `第 ${from}–${to} 项 · 共 ${rows.length} 项 · 第 ${current}/${pages} 页`;
+            pager.append(info);
+
+            pager.append(button("‹ 上一页", { page: current - 1, disabled: current === 1 }));
+            pageNumbers().forEach((n) => {
+              pager.append(n === null ? button("", { gap: true }) : button(String(n), { page: n, currentPage: n === current }));
+            });
+            pager.append(button("下一页 ›", { page: current + 1, disabled: current === pages }));
+          };
+
+          const go = (page, scroll) => {
+            current = Math.min(Math.max(1, page), pages);
+            let visible = 0;
+            rows.forEach((row, i) => {
+              const on = Math.floor(i / PER_PAGE) + 1 === current;
+              row.hidden = !on;
+              if (on) {
+                row.classList.toggle("is-alt", visible % 2 === 0);
+                visible++;
+              }
+            });
+            renderPager();
+            if (typeof applyVideoTitleWrap === "function") applyVideoTitleWrap();
+            if (scroll) archive.scrollIntoView({ block: "start" });
+            postHeight();
+          };
+
+          go(1, false);
+        })();
+      </script>
     </div>
 
     <hr style="margin-top: 2rem; padding-bottom: 1rem" />
-    <div class="center">正臀榜</div>
+    <div class="section-title" style="font-size: 1.2rem">正臀榜</div>
     <!-- 每行最多3个td -->
     <table class="tb1">
       <tr>
@@ -3261,22 +3999,88 @@
       </tr>
     </table>
     <hr style="margin-top: 2rem; padding-bottom: 1rem" />
-    <div class="center">翘臀榜</div>
+    <div class="section-title" style="font-size: 1.2rem">翘臀榜</div>
     <!-- 每行最多3个td -->
     <table class="tb1">
       <tr>
         <td>预留</td>
       </tr>
     </table>
-    <hr style="margin-top: 2rem; padding-bottom: 1rem" />
-    <!-- 每行5个 -->
-    <div class="center">一般拳师</div>
-    <table class="tb1">
-      <tr>
-        <td></td>
-      </tr>
-    </table>
   </body>
+  <script>
+    (function () {
+      const pop = document.createElement("div");
+      pop.className = "tip-pop";
+      pop.hidden = true;
+      document.body.appendChild(pop);
+      let current = null;
+
+      const hide = () => {
+        current = null;
+        pop.classList.remove("is-on");
+        pop.hidden = true;
+      };
+
+      const show = (el) => {
+        const text = el.dataset.tip;
+        if (!text) return;
+        current = el;
+        pop.textContent = text;
+        pop.hidden = false;
+
+        const r = el.getBoundingClientRect();
+        const vw = document.documentElement.clientWidth;
+        const pad = 8;
+        let left = r.left + window.scrollX + r.width / 2 - pop.offsetWidth / 2;
+        left = Math.max(window.scrollX + pad, Math.min(left, window.scrollX + vw - pop.offsetWidth - pad));
+        const top = r.top - pop.offsetHeight - pad < 0 ? r.bottom + window.scrollY + pad : r.top + window.scrollY - pop.offsetHeight - pad;
+        pop.style.left = `${Math.round(left)}px`;
+        pop.style.top = `${Math.round(top)}px`;
+        requestAnimationFrame(() => pop.classList.add("is-on"));
+      };
+
+      document.addEventListener("mouseover", (e) => {
+        const el = e.target.closest("[data-tip]");
+        if (el && el !== current) show(el);
+      });
+      document.addEventListener("mouseout", (e) => {
+        const el = e.target.closest("[data-tip]");
+        if (el && el === current) hide();
+      });
+      document.addEventListener("focusin", (e) => {
+        const el = e.target.closest("[data-tip]");
+        if (el) show(el);
+      });
+      document.addEventListener("focusout", hide);
+      window.addEventListener("scroll", () => current && hide(), { passive: true });
+    })();
+
+    (function () {
+      const MAX = 8;
+      const isWide = (ch) => /[ᄀ-ᅟ⺀-〾ぁ-㏿㐀-䶿一-鿿ꀀ-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/.test(ch);
+      const width = (str) => [...str].reduce((w, ch) => w + (isWide(ch) ? 1 : 0.5), 0);
+
+      const clamp = (str) => {
+        let w = 0;
+        let out = "";
+        for (const ch of str) {
+          const next = w + (isWide(ch) ? 1 : 0.5);
+          if (next > MAX) break;
+          out += ch;
+          w = next;
+        }
+        return `${out.trimEnd()}…`;
+      };
+
+      document.querySelectorAll("#honor .honor-item a, #archive .作者").forEach((el) => {
+        const full = el.textContent.trim();
+        if (!full || width(full) <= MAX) return;
+        el.textContent = clamp(full);
+        el.dataset.tip = full;
+        el.classList.add("has-tip");
+      });
+    })();
+  </script>
   <script>
     // 设置所有链接在新标签页打开
     document.querySelectorAll("a").forEach((link) => {
