@@ -695,10 +695,32 @@
       }
     </style>
     <script>
-      window.onload = function () {
-        const height = document.documentElement.scrollHeight;
-        parent.postMessage({ type: "setIframeHeight", height }, "*");
-      };
+      (function () {
+        let last = 0;
+        const post = () => {
+          const body = document.body;
+          if (!body) return;
+          const height = Math.ceil(body.getBoundingClientRect().height);
+          if (!height || Math.abs(height - last) < 2) return;
+          last = height;
+          parent.postMessage({ type: "setIframeHeight", height }, "*");
+        };
+
+        window.postIframeHeight = post;
+        window.addEventListener("message", (e) => {
+          if (e.data && e.data.type === "requestIframeHeight") {
+            last = 0;
+            post();
+          }
+        });
+        window.addEventListener("load", post);
+        window.addEventListener("resize", post);
+        window.addEventListener("orientationchange", post);
+        document.addEventListener("DOMContentLoaded", () => {
+          post();
+          if (window.ResizeObserver) new ResizeObserver(post).observe(document.body);
+        });
+      })();
     </script>
   </head>
 
@@ -3917,7 +3939,7 @@
           let current = 1;
 
           const postHeight = () => {
-            parent.postMessage({ type: "setIframeHeight", height: document.documentElement.scrollHeight }, "*");
+            if (typeof window.postIframeHeight === "function") window.postIframeHeight();
           };
 
           const button = (label, { page, disabled, currentPage, gap } = {}) => {
