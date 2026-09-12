@@ -349,58 +349,6 @@
         }
       }
 
-      /* 手机：并排后列变窄，整体再收一档，尽量让每条保持一行 */
-      @media (max-width: 600px) {
-        .honor-wrap {
-          gap: 0.5rem;
-        }
-
-        .honor-card {
-          padding: 0 0.55rem 0.5rem;
-        }
-
-        .honor-head {
-          margin: 0 -0.55rem;
-          padding: 0.45rem 0.55rem 0.25rem;
-          gap: 0.35rem;
-        }
-
-        .honor-head::before {
-          left: 0.55rem;
-          width: 3.5rem;
-        }
-
-        .honor-title {
-          font-size: 0.9rem;
-        }
-
-        .honor-count {
-          padding: 0.05rem 0.4rem;
-          font-size: 0.65rem;
-        }
-
-        .honor-item {
-          padding: 0.1rem 0.25rem;
-          gap: 0.25rem;
-          font-size: 0.82rem;
-        }
-
-        .honor-item::before {
-          min-width: 0.9rem;
-          font-size: 0.62rem;
-        }
-
-        .honor-note {
-          padding: 0 0.28rem;
-          font-size: 0.62rem;
-        }
-
-        .honor-toggle {
-          padding: 0.2rem 0.4rem;
-          font-size: 0.68rem;
-        }
-      }
-
       .honor-card[data-honor="army"] {
         grid-column: 1 / -1;
       }
@@ -507,10 +455,8 @@
         white-space: nowrap;
       }
 
-      @media (max-width: 420px) {
-        .honor-sub {
-          display: none;
-        }
+      .honor-sub-short {
+        display: none;
       }
 
       .honor-sub-dot {
@@ -684,6 +630,80 @@
         border-radius: var(--radius-sm);
       }
 
+      /* ===== 手机（窄屏）适配：两张榜单并排后列更窄，整体再收一档 ===== */
+      @media (max-width: 600px) {
+        .honor-wrap {
+          gap: 0.5rem;
+        }
+
+        .honor-card {
+          padding: 0 0.55rem 0.5rem;
+        }
+
+        .honor-head {
+          margin: 0 -0.55rem;
+          padding: 0.45rem 0.55rem 0.25rem;
+          gap: 0.3rem;
+        }
+
+        .honor-head::before {
+          left: 0.55rem;
+          width: 3.5rem;
+        }
+
+        .honor-title {
+          flex: 0 1 auto;
+          min-width: 0;
+          font-size: 0.82rem;
+        }
+
+        .honor-count {
+          padding: 0.05rem 0.32rem;
+          font-size: 0.62rem;
+        }
+
+        .honor-item {
+          padding: 0.1rem 0.25rem;
+          gap: 0.25rem;
+          font-size: 0.82rem;
+        }
+
+        .honor-item::before {
+          min-width: 0.9rem;
+          font-size: 0.62rem;
+        }
+
+        .honor-note {
+          padding: 0 0.28rem;
+          font-size: 0.62rem;
+        }
+
+        .honor-toggle {
+          padding: 0.2rem 0.4rem;
+          font-size: 0.68rem;
+        }
+
+
+        .honor-head .honor-count {
+          margin-left: auto;
+        }
+
+        .honor-sub {
+          gap: 0;
+          font-size: 0.6rem;
+          letter-spacing: 0;
+        }
+
+        .honor-sub-long,
+        .honor-sub-dot {
+          display: none;
+        }
+
+        .honor-sub-short {
+          display: inline;
+        }
+      }
+
       .tb1 {
         border-radius: var(--radius-sm);
         overflow: hidden;
@@ -810,11 +830,15 @@
         <section class="honor-card" data-honor="up">
           <header class="honor-head">
             <h2 class="honor-title">逆天UP荣誉榜<span class="comment_s honor-joke">(笑)</span></h2>
-            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-sub"><span class="honor-sub-dot"></span><span class="honor-sub-long">按添加时间排序 · 新 → 旧</span><span class="honor-sub-short">新→旧</span></span>
             <span class="honor-count"></span>
             <button class="honor-close" type="button" hidden>收起 ▲</button>
           </header>
           <ol class="honor-list">
+            <li class="honor-item">
+              <a href="https://space.bilibili.com/3546787375745664">AA建材强姐</a>
+              <span class="honor-note honor-tag" data-tip="包庇极端女权，支持阉割男性，以金针菇等羞辱男性并主张破坏男性团结">女权</span>
+            </li>
             <li class="honor-item">
               <a href="https://space.bilibili.com/1163310693">茶呆呆吖</a>
               <span class="honor-note">视频及评论打拳</span>
@@ -858,11 +882,29 @@
         <section class="honor-card" data-honor="person">
           <header class="honor-head">
             <h2 class="honor-title">逆天人荣誉榜<span class="comment_s honor-joke">(笑)</span></h2>
-            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-sub"><span class="honor-sub-dot"></span><span class="honor-sub-long">按添加时间排序 · 新 → 旧</span><span class="honor-sub-short">新→旧</span></span>
             <span class="honor-count"></span>
             <button class="honor-close" type="button" hidden>收起 ▲</button>
           </header>
           <ol class="honor-list">
+            <li class="honor-item"><a href="https://space.bilibili.com/476181923">超级无敌美少女梦子</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/11091043">花果山土著</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/44954095">凉拌海浪</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/87220881">你可以叫我X</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/1332436296">想太多不是一件好事</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/393877299">nhtkdjbkufkgdk</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/3632301762152459">芜湖大白天下</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/11342434">金刚猫子</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/1942776458">梨花烤肉汤</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/363727972">Matcha小脑斧</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/1805880855">_十三日</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/372793519">花开富贵好命华</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/409573745">淡水咸鱼喵</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/286685736">妹深夜看骨科被哥抓包</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/560569">bili_560569</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/13738023">被攻击后自动加气运</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/617774018">mynameisdashie</a></li>
+            <li class="honor-item"><a href="https://space.bilibili.com/519661570">鸬鹚啄帕鲁</a></li>
             <li class="honor-item">
               <a href="https://space.bilibili.com/36043765">没钱的吸血鬼</a>
               <span class="honor-note honor-tag" tabindex="0" data-tip="&quot;整个男生群体被小红书喷其实也不是没有道理&quot;">言论</span>
@@ -889,11 +931,12 @@
         <section class="honor-card honor-compact" data-honor="army" data-rows="4" data-min-cols="2">
           <header class="honor-head">
             <h2 class="honor-title">拳师水军<span class="comment_s honor-joke">(笑)</span></h2>
-            <span class="honor-sub"><span class="honor-sub-dot"></span>按添加时间排序 · 新 → 旧</span>
+            <span class="honor-sub"><span class="honor-sub-dot"></span><span class="honor-sub-long">按添加时间排序 · 新 → 旧</span><span class="honor-sub-short">新→旧</span></span>
             <span class="honor-count"></span>
             <button class="honor-toggle" type="button" aria-expanded="false"></button>
           </header>
           <ol class="honor-list">
+            <li class="honor-item"><a href="https://space.bilibili.com/230117137">我沉睡的伽拉忒亚</a></li>
             <li class="honor-item">
               <a href="https://space.bilibili.com/435464839">淡奶油红茶</a>
               <span class="honor-note honor-tag" tabindex="0" data-tip="疑似有组织团体在冷门视频下集体评论">网暴水军</span>
@@ -1042,6 +1085,21 @@
           </div>
         </div>
         <div role="columnheader" style="color: var(--text-strong)">备注</div>
+      </div>
+            <div role="row">
+        <div role="cell">
+          <a class="归档链接" href="https://t.me/NnShared/161"><div class="归档ID">172</div></a>
+        </div>
+        <div role="cell">
+          <a class="视频链接" href="https://www.bilibili.com/video/BV1d48x6yEeN"><div class="视频标题">大反转！浙江KTV19岁女生被打事件，全网同情翻车，官方通报还原全部真相</div></a>
+        </div>
+        <div role="cell">
+          <div class="视频时间">2026/08/23 09:40:01</div>
+          <div class="作者wrap">
+            <a class="作者链接" href="https://space.bilibili.com/2014663121"><div class="作者">蔚蓝的大海怪</div></a>
+          </div>
+        </div>
+        <div role="cell"><div class="注">-</div></div>
       </div>
       <div role="row">
         <div role="cell">
